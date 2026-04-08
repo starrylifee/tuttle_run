@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MAX_MOVE_CM, MIN_MOVE_CM } from '../../data/gameData';
 import type { CommandDraft, GameCommand, RotationDirection } from '../../types/game';
 import { formatCommandLabel } from '../../utils/commands';
@@ -13,13 +13,7 @@ const ROTATION_OPTIONS: Array<{
 }> = [
   { value: 'none:0', label: '회전 없음', rotation: 'none', angle: 0 },
   { value: 'left:90', label: '왼쪽 90°', rotation: 'left', angle: 90 },
-  { value: 'left:180', label: '왼쪽 180°', rotation: 'left', angle: 180 },
-  { value: 'left:270', label: '왼쪽 270°', rotation: 'left', angle: 270 },
-  { value: 'left:360', label: '왼쪽 360°', rotation: 'left', angle: 360 },
   { value: 'right:90', label: '오른쪽 90°', rotation: 'right', angle: 90 },
-  { value: 'right:180', label: '오른쪽 180°', rotation: 'right', angle: 180 },
-  { value: 'right:270', label: '오른쪽 270°', rotation: 'right', angle: 270 },
-  { value: 'right:360', label: '오른쪽 360°', rotation: 'right', angle: 360 },
 ];
 
 interface CommandPanelProps {
@@ -55,6 +49,15 @@ export function CommandPanel({
 
   const selectedRotationValue =
     draft.rotation === 'none' ? 'none:0' : `${draft.rotation}:${draft.angle}`;
+
+  useEffect(() => {
+    const isValidRotation = ROTATION_OPTIONS.some((option) => option.value === selectedRotationValue);
+
+    if (!isValidRotation) {
+      onDraftChange('rotation', 'none');
+      onDraftChange('angle', 0);
+    }
+  }, [onDraftChange, selectedRotationValue]);
 
   function handleRotationChange(value: string) {
     const nextRotation =

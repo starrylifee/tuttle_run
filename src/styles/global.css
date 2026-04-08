@@ -776,6 +776,13 @@ button {
   line-height: 1.6;
 }
 
+.modal-card__detail {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 .modal-card__close {
   flex: 0 0 auto;
   height: 36px;
@@ -806,6 +813,19 @@ button {
 
 .modal-copy p {
   margin: 0;
+}
+
+.password-modal__field {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.password-modal__error {
+  margin: 10px 0 0;
+  color: #d93025;
+  text-align: left;
+  font-size: 0.92rem;
+  font-weight: 700;
 }
 
 .modal-steps {

@@ -18,6 +18,14 @@ import type {
 
 const STORAGE_KEY = 'turtle-school-treasure-run:v1';
 
+function sanitizeAngle(rotation: CommandDraft['rotation'], _value: unknown) {
+  if (rotation === 'none') {
+    return 0;
+  }
+
+  return 90;
+}
+
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
@@ -54,7 +62,7 @@ function sanitizeDraft(value: unknown): CommandDraft {
 
   return {
     rotation,
-    angle: typeof value.angle === 'number' ? value.angle : DEFAULT_COMMAND_DRAFT.angle,
+    angle: sanitizeAngle(rotation, value.angle),
     distanceCm:
       typeof value.distanceCm === 'number'
         ? clampDistanceCm(value.distanceCm)
@@ -95,7 +103,7 @@ function sanitizeCommands(value: unknown): GameCommand[] {
     commands.push({
       type: 'move',
       rotation,
-      angle: typeof entry.angle === 'number' ? entry.angle : DEFAULT_COMMAND_DRAFT.angle,
+      angle: sanitizeAngle(rotation, entry.angle),
       distanceCm:
         typeof entry.distanceCm === 'number'
           ? clampDistanceCm(entry.distanceCm)

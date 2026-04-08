@@ -14,3 +14,49 @@ export function formatDateTime(dateString: string) {
     timeStyle: 'short',
   }).format(new Date(dateString));
 }
+
+function pad(value: number, length = 2) {
+  return value.toString().padStart(length, '0');
+}
+
+export function formatPreciseDateTime(dateString: string) {
+  const date = new Date(dateString);
+
+  return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())} ${pad(
+    date.getHours(),
+  )}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${pad(date.getMilliseconds(), 3)}`;
+}
+
+export function formatPreciseDateTimeForFile(dateString: string) {
+  const date = new Date(dateString);
+
+  return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(
+    date.getHours(),
+  )}${pad(date.getMinutes())}${pad(date.getSeconds())}_${pad(date.getMilliseconds(), 3)}`;
+}
+
+export async function getCurrentServerTimestamp() {
+  const fallback = new Date().toISOString();
+
+  if (typeof window === 'undefined') {
+    return fallback;
+  }
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'HEAD',
+      cache: 'no-store',
+    });
+    const headerValue = response.headers.get('date');
+
+    if (!headerValue) {
+      return fallback;
+    }
+
+    const serverDate = new Date(headerValue);
+
+    return Number.isNaN(serverDate.getTime()) ? fallback : serverDate.toISOString();
+  } catch {
+    return fallback;
+  }
+}

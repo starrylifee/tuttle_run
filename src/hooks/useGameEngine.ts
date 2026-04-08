@@ -32,7 +32,7 @@ import {
   loadStoredGameData,
   saveStoredGameData,
 } from '../utils/storage';
-import { formatDuration } from '../utils/time';
+import { formatDuration, getCurrentServerTimestamp } from '../utils/time';
 
 const TOAST_DURATION = 2400;
 
@@ -58,6 +58,14 @@ function normalizeDistanceCmInput(value: number) {
   return clampDistanceCm(value);
 }
 
+function normalizeDraftAngle(rotation: CommandDraft['rotation'], _angle: number) {
+  if (rotation === 'none') {
+    return 0;
+  }
+
+  return 90;
+}
+
 export function useGameEngine() {
   const [stored] = useState(() => loadStoredGameData());
   const [level, setLevel] = useState(stored.session.level);
@@ -75,6 +83,8 @@ export function useGameEngine() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [resultOpen, setResultOpen] = useState(false);
   const [finalTimeMs, setFinalTimeMs] = useState<number | null>(null);
+  const [finalCompletedAt, setFinalCompletedAt] = useState<string | null>(null);
+  const [pendingFinishedAtMs, setPendingFinishedAtMs] = useState<number | null>(null);
   const [stageSolution, setStageSolution] = useState<StageSolutionState | null>(null);
   const [now, setNow] = useState(Date.now());
 
@@ -144,10 +154,17 @@ export function useGameEngine() {
   }
 
   function updateDraft<Key extends keyof CommandDraft>(key: Key, value: CommandDraft[Key]) {
-    setDraft((current) => ({
-      ...current,
-      [key]: key === 'distanceCm' ? normalizeDistanceCmInput(Number(value)) : value,
-    }));
+    setDraft((current) => {
+      const nextDraft = {
+        ...current,
+        [key]: key === 'distanceCm' ? normalizeDistanceCmInput(Number(value)) : value,
+      };
+
+      return {
+        ...nextDraft,
+        angle: normalizeDraftAngle(nextDraft.rotation, nextDraft.angle),
+      };
+    });
   }
 
   function addMoveCommand() {
@@ -156,7 +173,7 @@ export function useGameEngine() {
     }
 
     const distanceCm = normalizeDistanceCmInput(draft.distanceCm);
-    const angle = draft.rotation === 'none' ? 0 : draft.angle;
+    const angle = normalizeDraftAngle(draft.rotation, draft.angle);
 
     setCommands((current) => [
       ...current,
@@ -219,6 +236,8 @@ export function useGameEngine() {
     setTreasureCollected(false);
     setResultOpen(false);
     setFinalTimeMs(null);
+    setFinalCompletedAt(null);
+    setPendingFinishedAtMs(null);
     setNow(Date.now());
 
     saveStoredGameData({
@@ -228,11 +247,12 @@ export function useGameEngine() {
   }
 
   function completeGame(startedAt: number) {
-    const finishedAt = Date.now();
+    const finishedAt = pendingFinishedAtMs ?? Date.now();
+    const completedAt = finalCompletedAt ?? new Date(finishedAt).toISOString();
     const durationMs = Math.max(0, finishedAt - startedAt);
     const nextRecord: GameRecord = {
       id: createId('record'),
-      completedAt: new Date(finishedAt).toISOString(),
+      completedAt,
       durationMs,
     };
 
@@ -242,6 +262,8 @@ export function useGameEngine() {
 
     setRecords(nextRecords);
     setFinalTimeMs(durationMs);
+    setFinalCompletedAt(completedAt);
+    setPendingFinishedAtMs(null);
     setResultOpen(true);
     setStageSolution(null);
     setLevel(1);
@@ -412,9 +434,23 @@ export function useGameEngine() {
         }
 
         if (distanceBetween(workingTurtle, currentLevel.treasure) <= TREASURE_CATCH_RADIUS) {
+          const finishedAt = Date.now();
+          const fallbackCompletedAt = new Date(finishedAt).toISOString();
+
           setTreasureCollected(true);
           pushToast('보물을 잡았어요!', 'success');
           await delay(650);
+
+          if (level === LEVELS.length) {
+            setPendingFinishedAtMs(finishedAt);
+            setFinalCompletedAt(fallbackCompletedAt);
+            void getCurrentServerTimestamp().then((serverTimestamp) => {
+              setFinalCompletedAt((current) =>
+                current === fallbackCompletedAt ? serverTimestamp : current,
+              );
+            });
+          }
+
           setStageSolution({ level, reason: 'success' });
           return;
         }
@@ -451,6 +487,7 @@ export function useGameEngine() {
     toasts,
     resultOpen,
     finalTimeMs,
+    finalCompletedAt,
     stageSolution,
     updateDraft,
     addMoveCommand,

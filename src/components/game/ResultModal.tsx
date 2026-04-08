@@ -1,11 +1,23 @@
+import {
+  formatPreciseDateTime,
+  formatPreciseDateTimeForFile,
+  getCurrentServerTimestamp,
+} from '../../utils/time';
+
 interface ResultModalProps {
   isOpen: boolean;
   finalTimeText: string;
   bestTimeText: string;
+  completedAt: string | null;
   onRestart: () => void;
 }
 
-function downloadCertificate(finalTimeText: string) {
+async function downloadCertificate(finalTimeText: string, completedAt: string | null) {
+  const resolvedCompletedAt = completedAt ?? new Date().toISOString();
+  const savedAt = await getCurrentServerTimestamp();
+  const completedAtText = formatPreciseDateTime(resolvedCompletedAt);
+  const savedAtText = formatPreciseDateTime(savedAt);
+  const fileStamp = formatPreciseDateTimeForFile(savedAt);
   const canvas = document.createElement('canvas');
   canvas.width = 1200;
   canvas.height = 900;
@@ -46,11 +58,12 @@ function downloadCertificate(finalTimeText: string) {
 
   context.fillStyle = '#5f6368';
   context.font = '500 28px "Noto Sans KR", sans-serif';
-  context.fillText(new Date().toLocaleDateString('ko-KR'), 600, 690);
-  context.fillText('거북이 보물찾기 교실', 600, 738);
+  context.fillText(`완료 시각 ${completedAtText}`, 600, 674);
+  context.fillText(`JPG 저장 시각 ${savedAtText}`, 600, 722);
+  context.fillText('거북이 보물찾기 교실', 600, 770);
 
   const link = document.createElement('a');
-  link.download = '거북이_보물찾기_기록.jpg';
+  link.download = `거북이_보물찾기_기록_${fileStamp}.jpg`;
   link.href = canvas.toDataURL('image/jpeg', 0.92);
   link.click();
 }
@@ -59,11 +72,14 @@ export function ResultModal({
   isOpen,
   finalTimeText,
   bestTimeText,
+  completedAt,
   onRestart,
 }: ResultModalProps) {
   if (!isOpen) {
     return null;
   }
+
+  const completedAtText = formatPreciseDateTime(completedAt ?? new Date().toISOString());
 
   return (
     <div className="modal-backdrop" role="dialog" aria-modal="true">
@@ -73,11 +89,17 @@ export function ResultModal({
         <p className="modal-card__copy">
           이번 기록은 <strong>{finalTimeText}</strong> 입니다. 현재 최고 기록은 {bestTimeText}입니다.
         </p>
+        <p className="modal-card__detail">마지막 완료 시각 {completedAtText}</p>
 
         <div className="modal-card__time">{finalTimeText}</div>
 
         <div className="modal-card__actions">
-          <button className="button button--primary" onClick={() => downloadCertificate(finalTimeText)}>
+          <button
+            className="button button--primary"
+            onClick={() => {
+              void downloadCertificate(finalTimeText, completedAt);
+            }}
+          >
             기록 JPG 다운로드
           </button>
           <button className="button button--subtle" onClick={onRestart}>

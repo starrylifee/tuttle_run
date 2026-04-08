@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AdminPasswordModal } from './components/game/AdminPasswordModal';
 import { CommandPanel } from './components/game/CommandPanel';
 import { GameBoard } from './components/game/GameBoard';
 import { GuideModal } from './components/game/GuideModal';
@@ -25,6 +26,7 @@ function App() {
   });
   const [isMissionOpen, setIsMissionOpen] = useState(false);
   const [isRecordsOpen, setIsRecordsOpen] = useState(false);
+  const [isAdminPasswordOpen, setIsAdminPasswordOpen] = useState(false);
   const [lastMissionLevel, setLastMissionLevel] = useState<number | null>(null);
   const solutionLevelData = game.stageSolution ? LEVELS[game.stageSolution.level - 1] : null;
 
@@ -64,6 +66,19 @@ function App() {
     setIsGuideOpen(false);
     setIsMissionOpen(false);
     setIsRecordsOpen(true);
+  }
+
+  function openAdminPassword() {
+    setIsAdminPasswordOpen(true);
+  }
+
+  function closeAdminPassword() {
+    setIsAdminPasswordOpen(false);
+  }
+
+  function confirmGiveUpLevel() {
+    setIsAdminPasswordOpen(false);
+    game.giveUpLevel();
   }
 
   return (
@@ -125,7 +140,7 @@ function App() {
               onRemoveCommand={game.removeCommand}
               onRunCommands={game.runCommands}
               onResetLevel={game.resetLevel}
-              onGiveUpLevel={game.giveUpLevel}
+              onGiveUpLevel={openAdminPassword}
             />
           </aside>
         </main>
@@ -134,6 +149,12 @@ function App() {
       <ToastViewport toasts={game.toasts} onDismiss={game.dismissToast} />
 
       <GuideModal isOpen={isGuideOpen} onClose={closeGuide} />
+
+      <AdminPasswordModal
+        isOpen={isAdminPasswordOpen}
+        onClose={closeAdminPassword}
+        onSuccess={confirmGiveUpLevel}
+      />
 
       <MissionModal
         isOpen={isMissionOpen}
@@ -181,6 +202,7 @@ function App() {
         isOpen={game.resultOpen}
         finalTimeText={game.finalTimeMs ? formatDuration(game.finalTimeMs) : '00:00'}
         bestTimeText={game.bestRecord ? formatDuration(game.bestRecord.durationMs) : '기록 없음'}
+        completedAt={game.finalCompletedAt}
         onRestart={game.restartGame}
       />
     </>
