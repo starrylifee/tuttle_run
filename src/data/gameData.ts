@@ -15,7 +15,7 @@ export const TURTLE_RADIUS = 16;
 export const TREASURE_CATCH_RADIUS = 56;
 export const MAX_RECORDS = 8;
 export const MIN_MOVE_CM = 1;
-export const MAX_MOVE_CM = 24;
+export const MAX_MOVE_CM = 99;
 
 export const DEFAULT_COMMAND_DRAFT: CommandDraft = {
   rotation: 'none',
@@ -61,7 +61,7 @@ export const LEVELS: LevelConfig[] = [
     start: { x: 480, y: 100, angle: 180 },
     treasure: { x: 390, y: 150 },
     goal: '먼저 아래로 내려온 뒤 왼쪽으로 꺾어 첫 번째 보물을 잡아 보세요.',
-    solution: [move('none', 0, 5), move('right', 90, 9), catchCommand],
+    solution: [move('right', 90, 7), catchCommand],
   },
   {
     id: 2,
@@ -69,7 +69,7 @@ export const LEVELS: LevelConfig[] = [
     start: { x: 480, y: 100, angle: 180 },
     treasure: { x: 100, y: 120 },
     goal: '윗길을 따라 길게 이동해 왼쪽 끝 보물을 잡아 보세요.',
-    solution: [move('none', 0, 2), move('right', 90, 14), move('none', 0, 24), catchCommand],
+    solution: [move('none', 0, 2), move('right', 90, 33), catchCommand],
   },
   {
     id: 3,
@@ -77,7 +77,7 @@ export const LEVELS: LevelConfig[] = [
     start: { x: 480, y: 100, angle: 180 },
     treasure: { x: 555, y: 420 },
     goal: '오른쪽 통로를 지나 아래쪽 강당 옆 보물까지 가 보세요.',
-    solution: [move('none', 0, 10), move('left', 90, 9), move('right', 90, 22), catchCommand],
+    solution: [move('none', 0, 10), move('left', 90, 9), move('right', 90, 17), catchCommand],
   },
   {
     id: 4,
@@ -85,13 +85,7 @@ export const LEVELS: LevelConfig[] = [
     start: { x: 480, y: 100, angle: 180 },
     treasure: { x: 100, y: 280 },
     goal: '윗길로 간 뒤 아래로 내려와 수돗가 위쪽 보물을 잡아 보세요.',
-    solution: [
-      move('none', 0, 2),
-      move('right', 90, 14),
-      move('none', 0, 24),
-      move('left', 90, 16),
-      catchCommand,
-    ],
+    solution: [move('none', 0, 13), move('right', 90, 36), catchCommand],
   },
   {
     id: 5,
@@ -99,12 +93,6 @@ export const LEVELS: LevelConfig[] = [
     start: { x: 480, y: 100, angle: 180 },
     treasure: { x: 160, y: 420 },
     goal: '운동장을 피해 왼쪽 아래 길로 돌아 마지막 보물을 잡아 보세요.',
-    solution: [
-      move('none', 0, 10),
-      move('right', 90, 10),
-      move('none', 0, 22),
-      move('left', 90, 22),
-      catchCommand,
-    ],
+    solution: [move('none', 0, 10), move('right', 90, 32), move('left', 90, 17), catchCommand],
   },
 ];

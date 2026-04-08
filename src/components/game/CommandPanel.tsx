@@ -120,7 +120,7 @@ export function CommandPanel({
               onClick={handleAddCommand}
               disabled={isRunning}
             >
-              스택에 넣기
+              명령입력
             </button>
           </div>
         </label>
