@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Roboto+Flex:wght@400;500;700;800&display=swap');
+
+:root {
+  color-scheme: light;
+  --bg: #f8fafd;
+  --surface: #ffffff;
+  --surface-muted: #f1f3f4;
+  --surface-tonal: #e8f0fe;
+  --ink: #202124;
+  --ink-soft: #5f6368;
+  --line: #dadce0;
+  --blue: #1a73e8;
+  --blue-soft: #d2e3fc;
+  --green: #1e8e3e;
+  --amber: #f9ab00;
+  --red: #d93025;
+  --shadow-sm: 0 1px 2px rgba(60, 64, 67, 0.12), 0 1px 3px rgba(60, 64, 67, 0.08);
+  --shadow-md: 0 4px 12px rgba(60, 64, 67, 0.12);
+  --radius-xl: 24px;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+}
