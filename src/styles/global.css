@@ -465,17 +465,32 @@ button {
 
 .command-builder {
   display: grid;
-  grid-template-columns: minmax(96px, 0.9fr) minmax(0, 1fr) auto;
-  gap: 8px;
+  grid-template-columns: minmax(82px, 0.9fr) minmax(82px, 96px) auto;
+  gap: 6px;
   align-items: center;
 }
 
 .command-builder__distance {
-  min-width: 0;
+  min-width: 82px;
+  gap: 6px;
 }
 
 .command-builder__distance input {
   flex: 1;
+  min-width: 0;
+  padding: 0 10px;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.command-builder__distance input::-webkit-outer-spin-button,
+.command-builder__distance input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.command-builder__distance strong {
+  flex: 0 0 auto;
 }
 
 .command-builder__spacer {
@@ -483,7 +498,8 @@ button {
 }
 
 .command-builder__button {
-  min-width: 116px;
+  min-width: 106px;
+  padding: 0 14px;
 }
 
 .command-panel__stack {
