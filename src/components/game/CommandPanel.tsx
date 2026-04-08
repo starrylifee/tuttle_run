@@ -46,6 +46,7 @@ export function CommandPanel({
   onGiveUpLevel,
 }: CommandPanelProps) {
   const [commandType, setCommandType] = useState<CommandType>('move');
+  const [distanceInput, setDistanceInput] = useState(() => String(draft.distanceCm));
 
   const selectedRotationValue =
     draft.rotation === 'none' ? 'none:0' : `${draft.rotation}:${draft.angle}`;
@@ -59,6 +60,10 @@ export function CommandPanel({
     }
   }, [onDraftChange, selectedRotationValue]);
 
+  useEffect(() => {
+    setDistanceInput(String(draft.distanceCm));
+  }, [draft.distanceCm]);
+
   function handleRotationChange(value: string) {
     const nextRotation =
       ROTATION_OPTIONS.find((option) => option.value === value) ?? ROTATION_OPTIONS[0];
@@ -67,9 +72,32 @@ export function CommandPanel({
     onDraftChange('angle', nextRotation.angle);
   }
 
+  function handleDistanceChange(value: string) {
+    setDistanceInput(value);
+
+    if (value === '') {
+      return;
+    }
+
+    onDraftChange('distanceCm', Number(value));
+  }
+
+  function handleDistanceBlur() {
+    if (distanceInput !== '') {
+      return;
+    }
+
+    setDistanceInput(String(draft.distanceCm));
+  }
+
   function handleAddCommand() {
     if (commandType === 'catch') {
       onAddCatchCommand();
+      return;
+    }
+
+    if (distanceInput === '') {
+      setDistanceInput(String(draft.distanceCm));
       return;
     }
 
@@ -108,8 +136,9 @@ export function CommandPanel({
                   step={1}
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={draft.distanceCm}
-                  onChange={(event) => onDraftChange('distanceCm', Number(event.target.value))}
+                  value={distanceInput}
+                  onChange={(event) => handleDistanceChange(event.target.value)}
+                  onBlur={handleDistanceBlur}
                   disabled={isRunning}
                 />
                 <strong>cm</strong>
